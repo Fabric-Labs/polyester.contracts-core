@@ -217,6 +217,11 @@ contract FundingAccount is IFundingAccount, IProgramReceiver, RepeatCallGuard, A
     return uAssetConfigs[uAssetId];
   }
 
+  /// @dev Full external destination allowlist of an account for a destination chain, bounded by MAX_ALLOWED_EXTERNAL_DESTINATIONS
+  function getAllowedExternalDestinations(address account, uint16 chainId) external view returns (bytes[] memory) {
+    return allowedExternalDestinations[account][chainId];
+  }
+
   /**
    * @dev Generates a unique ID for a unified asset. The id is the lowercase of the name.
    * @param uAssetName The name of the unified asset
@@ -456,6 +461,7 @@ contract FundingAccount is IFundingAccount, IProgramReceiver, RepeatCallGuard, A
   /**
    * @dev Enables or disables external destination allowlist requirement for chain withdrawals.
    *      Disabling (required=false) requires guard approval.
+   *      An unchanged value emits no event; disabling still consumes the approval.
    * @param required Whether external destination allowlist checks are required
    * @param guardSigIfFalse Guard approval payload required only when required=false
    */
@@ -470,6 +476,7 @@ contract FundingAccount is IFundingAccount, IProgramReceiver, RepeatCallGuard, A
   /**
    * @dev Enables or disables internal account allowlist requirement for internal transfers.
    *      Disabling (required=false) requires guard approval.
+   *      An unchanged value emits no event; disabling still consumes the approval.
    * @param required Whether internal account allowlist checks are required
    * @param guardSigIfFalse Guard approval payload required only when required=false
    */
@@ -822,11 +829,13 @@ contract FundingAccount is IFundingAccount, IProgramReceiver, RepeatCallGuard, A
   }
 
   function _setExternalDestinationAllowlistRequired(address account, bool required) internal {
+    if (externalDestinationAllowlistRequired[account] == required) return;
     externalDestinationAllowlistRequired[account] = required;
     emit ExternalDestinationAllowlistRequirementUpdated(account, required);
   }
 
   function _setInternalAccountAllowlistRequired(address account, bool required) internal {
+    if (internalAccountAllowlistRequired[account] == required) return;
     internalAccountAllowlistRequired[account] = required;
     emit InternalAccountAllowlistRequirementUpdated(account, required);
   }

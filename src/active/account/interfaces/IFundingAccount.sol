@@ -249,6 +249,9 @@ interface IFundingAccount {
   /// @dev uAsset configuration mapping: uAsset id => TokenConfig
   function getUAssetConfig(bytes32 uAssetId) external view returns (TokenConfig memory);
 
+  /// @dev Full external destination allowlist of an account for a destination chain
+  function getAllowedExternalDestinations(address account, uint16 chainId) external view returns (bytes[] memory);
+
   /// @dev Reverts when a required internal account allowlist does not permit the destination
   function validateInternalAccountAllowlist(address fromAccount, address toAccount) external view;
 
