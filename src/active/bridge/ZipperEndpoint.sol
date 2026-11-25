@@ -803,6 +803,8 @@ contract ZipperEndpoint is EIP712Upgradeable, RepeatCallGuard, AccessControlUpgr
       if ((zTokenPauseFlags & ZTOKEN_WITHDRAWAL_DISABLED) != 0) revert ZTokenDisabled();
     }
     if (_isVaultOrSubVault(request.chainId, srcToken, request.withdrawDestination)) revert InvalidWithdrawDestination();
+    // A payout to a retired deposit address can no longer be credited.
+    if (keyFactory.isDepositAddressRetired(request.withdrawDestination)) revert InvalidWithdrawDestination();
 
     uint256 feeZAmount = feeFactory.getFee(request.chainId, request.zToken);
     if (feeZAmount > request.maxFee) revert FeeExceedsMax();
