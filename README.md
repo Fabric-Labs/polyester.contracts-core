@@ -1,6 +1,6 @@
 # polyester.contracts-core
 
-Solidity source of the Polychain contracts behind Zipper bridge deposits and withdrawals, the `FundingAccount` uAsset ledger and its `GuardRegistry` approvals. The repository contains only the contract source and the configuration needed to compile it; tests, deployment scripts and network configuration are maintained separately.
+Solidity source of the Polychain contracts behind Zipper bridge deposits and withdrawals, the `FundingAccount` uAsset ledger and its `GuardRegistry` approvals. The repository contains the contract source, the configuration needed to compile it, and scripts for a local deployment; tests, live deployment scripts and network configuration are maintained separately.
 
 ## Contracts
 
@@ -15,6 +15,7 @@ Solidity source of the Polychain contracts behind Zipper bridge deposits and wit
 | `src/active/bridge/ZipperFactoryVault.sol` | Vault registry |
 | `src/active/bridge/ZipperFactorySubVault.sol` | Sub-vault registry |
 | `src/active/tokens/ZToken.sol` | The zToken ERC-20 |
+| `src/active/tokens/SToken.sol` | Test token that stands in for a source-chain token in the local scripts; not part of the bridge |
 | `src/active/account/FundingAccount.sol` | uAsset ledger: bridge mint credit, zToken deposit and withdrawal, internal transfers, withdrawal to chain, delegates and allowlists |
 | `src/active/guard/GuardRegistry.sol` | Guard-signed approvals for protected `FundingAccount` actions |
 
@@ -30,6 +31,20 @@ yarn compile
 ```
 
 The build uses Hardhat 2.26.3, Solidity 0.8.22 with the optimizer enabled at 200 runs, and OpenZeppelin `@openzeppelin/contracts` and `@openzeppelin/contracts-upgradeable` 5.1.0. Hardhat reads sources from `src/active`.
+
+## Local deployment
+
+The scripts run on the in-process Hardhat network only and refuse any other network. They use Hardhat's test accounts.
+
+```bash
+yarn deploy:local
+yarn flow:local
+```
+
+- `scripts/deploy_local.js` deploys and links the contracts, registers one EVM chain with its address family, deploys an `SToken` as its source token, and creates and configures the zToken. It exports `deployLocal()`, which returns the accounts, the contracts and the configured values, so a Hardhat test can start from a fresh deployment.
+- `scripts/flow_local.js` runs one deposit, from the source transfer to the uAsset credit, and one withdrawal, from `withdrawToChain` to the burn, and checks the resulting balances.
+
+Test accounts take the relayer, validator and executor steps directly, without the off-chain checks. Validators vote with `validateRequest`. Each proxy has its own `ProxyAdmin`.
 
 ## Security
 

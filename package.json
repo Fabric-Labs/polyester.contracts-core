@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "compile": "hardhat compile"
+    "compile": "hardhat compile",
+    "deploy:local": "hardhat run scripts/deploy_local.js",
+    "flow:local": "hardhat run scripts/flow_local.js"
   },
   "dependencies": {
     "@openzeppelin/contracts": "5.1.0",
     "@openzeppelin/contracts-upgradeable": "5.1.0"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "3.0.5",
+    "ethers": "6.11.1",
     "hardhat": "2.26.3"
   }
 }
